@@ -3,6 +3,7 @@ import { hashPassword } from './hash.js';
 
 const uri = process.env.MONGODB_URI;
 
+// Reutiliza conexão entre invocações warm no mesmo processo
 let cached = globalThis.__mongo ?? (globalThis.__mongo = { conn: null, promise: null });
 
 export async function getCollection() {
