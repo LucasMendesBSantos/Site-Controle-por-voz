@@ -4,15 +4,15 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently -n \"vite,api\" -c \"cyan,yellow\" \"vite\" \"node server/server.js\"",
-    "server": "node server/server.js",
+    "dev": "concurrently -n \"vite,api\" -c \"cyan,yellow\" \"vite\" \"node --env-file=.env server/server.js\"",
+    "server": "node --env-file=.env server/server.js",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^0.10.4",
     "express": "^4.19.2",
-    "mongodb": "^6.21.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6"
   },

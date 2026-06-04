@@ -38,7 +38,7 @@
 /* ── App shell ─────────────────────────────────────────────── */
 .app {
   min-height: 100svh;
-  background: var(--bg);
+  background: #ffffff;
   display: flex;
   flex-direction: column;
 }

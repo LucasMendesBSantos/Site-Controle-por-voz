@@ -1,19 +1,24 @@
-import { getCollection, safe } from '../_lib/db.js';
+import { sql, ensureSchema } from '../_lib/db.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).end();
+  await ensureSchema();
 
   const q = (req.query.name || '').toLowerCase().trim();
   if (!q) return res.json(null);
 
-  const col = await getCollection();
-  const docs = await col.find({}).toArray();
-
-  const found = docs.find((c) => {
+  const customers = await sql`SELECT id, name, cpf, balance::float FROM customers`;
+  const found = customers.find((c) => {
     const full = c.name.toLowerCase();
     const first = full.split(' ')[0];
     return full.includes(q) || q.includes(first) || first.startsWith(q);
   });
 
-  res.json(found ? safe(found) : null);
+  if (!found) return res.json(null);
+
+  const txs = await sql`
+    SELECT id, date, type, value::float FROM transactions
+    WHERE customer_id = ${found.id} ORDER BY date DESC
+  `;
+  res.json({ ...found, transactions: txs });
 }
