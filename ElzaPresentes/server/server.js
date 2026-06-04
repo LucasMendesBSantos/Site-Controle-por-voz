@@ -89,6 +89,15 @@ function safe(customer) {
 const app = express();
 app.use(express.json());
 
+// Login do desenvolvedor (credenciais fixas — apenas no servidor)
+app.post('/api/dev-login', (req, res) => {
+  const { username, password } = req.body ?? {};
+  if (username === 'Lucas' && password === 'Hellen') {
+    return res.json({ ok: true });
+  }
+  res.status(401).json({ error: 'Usuário ou senha incorretos.' });
+});
+
 // Buscar cliente por nome (painel de voz)
 app.get('/api/customers/search', (req, res) => {
   const q = (req.query.name || '').toLowerCase().trim();

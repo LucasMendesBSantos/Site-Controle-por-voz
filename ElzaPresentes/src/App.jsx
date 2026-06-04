@@ -3,6 +3,7 @@ import AdminPanel from './pages/AdminPanel';
 import ClientLogin from './pages/ClientLogin';
 import ClientRegister from './pages/ClientRegister';
 import ClientDashboard from './pages/ClientDashboard';
+import DevLogin from './pages/DevLogin';
 import DevPanel from './pages/DevPanel';
 import './App.css';
 
@@ -13,11 +14,16 @@ export default function App() {
   const [view, setView] = useState(VIEW.ADMIN);
   const [clientView, setClientView] = useState(CVIEW.LOGIN);
   const [customer, setCustomer] = useState(null);
+  const [devAuth, setDevAuth] = useState(false);
 
   const switchToClient = () => {
     setView(VIEW.CLIENT);
     setClientView(CVIEW.LOGIN);
     setCustomer(null);
+  };
+
+  const switchToDev = () => {
+    setView(VIEW.DEV);
   };
 
   const handleLogout = () => {
@@ -47,7 +53,7 @@ export default function App() {
           </button>
           <button
             className={`tab tab-dev ${view === VIEW.DEV ? 'active-dev' : ''}`}
-            onClick={() => setView(VIEW.DEV)}
+            onClick={switchToDev}
           >
             🛠️ Dev
           </button>
@@ -73,7 +79,11 @@ export default function App() {
           )
         )}
 
-        {view === VIEW.DEV && <DevPanel />}
+        {view === VIEW.DEV && (
+          devAuth
+            ? <DevPanel onLogout={() => setDevAuth(false)} />
+            : <DevLogin onLogin={() => setDevAuth(true)} />
+        )}
       </main>
 
       <footer className="app-footer">

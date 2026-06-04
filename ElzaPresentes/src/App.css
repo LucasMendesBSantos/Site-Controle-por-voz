@@ -435,6 +435,26 @@
 }
 .btn-login:disabled { opacity: .6; cursor: not-allowed; }
 
+.btn-login-dev {
+  background: linear-gradient(135deg, #92400e, #78350f);
+  box-shadow: 0 4px 14px rgba(120,53,15,.4);
+}
+.btn-login-dev:hover:not(:disabled) {
+  box-shadow: 0 6px 20px rgba(120,53,15,.5);
+}
+
+.dev-login-card {
+  border-top: 4px solid var(--amber);
+}
+
+.dev-logout-btn {
+  color: var(--red) !important;
+  border-color: var(--red-border) !important;
+}
+.dev-logout-btn:hover {
+  background: var(--red-bg) !important;
+}
+
 .auth-switch {
   margin-top: 1.25rem;
   text-align: center;

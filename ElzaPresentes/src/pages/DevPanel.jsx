@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { getAllCustomers, onDBUpdate } from '../data/db';
 import { formatCurrency, formatDate, formatCPF } from '../utils/speechParser';
 
-export default function DevPanel() {
+export default function DevPanel({ onLogout }) {
   const [customers, setCustomers] = useState([]);
   const [expanded, setExpanded] = useState(null);
 
@@ -49,7 +49,10 @@ export default function DevPanel() {
       <div className="dev-section">
         <div className="dev-section-head">
           <h3>Clientes cadastrados</h3>
-          <button className="btn-refresh" onClick={refresh}>🔄 Atualizar</button>
+          <div style={{ display: 'flex', gap: '.5rem' }}>
+            <button className="btn-refresh" onClick={refresh}>🔄 Atualizar</button>
+            <button className="btn-refresh dev-logout-btn" onClick={onLogout}>🚪 Sair</button>
+          </div>
         </div>
 
         <div className="dev-list">
