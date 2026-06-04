@@ -1,0 +1,75 @@
+{
+  "customers": [
+    {
+      "id": "1",
+      "name": "Maria Silva",
+      "cpf": "12345678900",
+      "passwordHash": "LTExODA2NjU5MzI=",
+      "balance": 150,
+      "transactions": [
+        {
+          "id": "t1",
+          "date": "2025-12-10T10:30:00",
+          "type": "compra",
+          "value": 200
+        },
+        {
+          "id": "t2",
+          "date": "2025-12-15T14:00:00",
+          "type": "pagamento",
+          "value": 50
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "name": "João Santos",
+      "cpf": "98765432100",
+      "passwordHash": "MTU4OTkyNTUzMA==",
+      "balance": 0,
+      "transactions": [
+        {
+          "id": "t3",
+          "date": "2025-12-08T09:00:00",
+          "type": "compra",
+          "value": 100
+        },
+        {
+          "id": "t4",
+          "date": "2025-12-09T11:00:00",
+          "type": "pagamento",
+          "value": 100
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "name": "Ana Oliveira",
+      "cpf": "45678912300",
+      "passwordHash": "ODkxNzU4MDA3",
+      "balance": 280.5,
+      "transactions": [
+        {
+          "id": "t5",
+          "date": "2025-12-01T08:00:00",
+          "type": "compra",
+          "value": 500
+        },
+        {
+          "id": "t6",
+          "date": "2025-12-05T16:00:00",
+          "type": "pagamento",
+          "value": 219.5
+        }
+      ]
+    },
+    {
+      "id": "c1780599531892",
+      "name": "teste",
+      "cpf": "00000000000",
+      "passwordHash": "LTE5ODMwMTM4OTk=",
+      "balance": 0,
+      "transactions": []
+    }
+  ]
+}
