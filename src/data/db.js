@@ -55,6 +55,26 @@ export async function addTransaction(customerId, type, value) {
   return r.ok;
 }
 
+export async function updateCustomerName(id, name) {
+  const r = await fetch(`${API}/customers/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name }),
+  });
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) return { error: data.error || 'Erro ao atualizar.' };
+  dispatch();
+  return { ok: true };
+}
+
+export async function deleteCustomer(id) {
+  const r = await fetch(`${API}/customers/${id}`, { method: 'DELETE' });
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) return { error: data.error || 'Erro ao excluir.' };
+  dispatch();
+  return { ok: true };
+}
+
 export async function registerCustomer(name, cpf, password) {
   const r = await fetch(`${API}/customers`, {
     method: 'POST',

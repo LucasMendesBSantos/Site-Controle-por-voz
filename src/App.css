@@ -740,14 +740,63 @@
   justify-content: space-between;
   gap: 1rem;
   padding: 1rem 1.5rem;
-  background: none;
-  border: none;
   cursor: pointer;
   text-align: left;
   transition: background .15s;
+  user-select: none;
 }
 .dev-row-head:hover { background: var(--bg); }
 .dev-row.open .dev-row-head:hover { background: var(--amber-bg); }
+
+/* Action buttons (edit / delete / save / cancel) */
+.btn-action {
+  padding: .3rem .55rem;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  font-size: .8rem;
+  cursor: pointer;
+  line-height: 1;
+  transition: background .15s, border-color .15s, opacity .15s;
+  flex-shrink: 0;
+}
+.btn-action:disabled { opacity: .5; cursor: not-allowed; }
+.btn-action-edit:hover   { background: var(--bg); }
+.btn-action-delete:hover { background: var(--red-bg); border-color: var(--red-border); }
+.btn-action-save   { border-color: var(--green-border); color: var(--green); }
+.btn-action-save:hover   { background: var(--green-bg); }
+.btn-action-cancel { border-color: var(--border); color: var(--muted); }
+.btn-action-cancel:hover { background: var(--bg); }
+
+/* Inline edit form */
+.dev-edit-form {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+}
+.dev-edit-input {
+  font-size: .95rem;
+  font-weight: 700;
+  border: 1.5px solid var(--purple);
+  border-radius: var(--r-sm);
+  padding: .25rem .5rem;
+  outline: none;
+  width: 180px;
+  color: var(--text);
+}
+
+/* Delete confirmation inline */
+.dev-confirm-delete {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+}
+.dev-confirm-text {
+  font-size: .8rem;
+  color: var(--red);
+  font-weight: 600;
+  white-space: nowrap;
+}
 
 .dev-row-left {
   display: flex;

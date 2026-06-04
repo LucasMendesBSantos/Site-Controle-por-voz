@@ -77,6 +77,28 @@ app.get('/api/customers/:id', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+// ── Editar nome do cliente ───────────────────────────────────
+app.patch('/api/customers/:id', async (req, res) => {
+  try {
+    const sql = getSql();
+    const { name } = req.body ?? {};
+    if (!name?.trim()) return res.status(400).json({ error: 'Nome é obrigatório.' });
+    const rows = await sql`UPDATE customers SET name = ${name.trim()} WHERE id = ${req.params.id} RETURNING id`;
+    if (!rows[0]) return res.status(404).json({ error: 'Cliente não encontrado.' });
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// ── Excluir cliente ──────────────────────────────────────────
+app.delete('/api/customers/:id', async (req, res) => {
+  try {
+    const sql = getSql();
+    const rows = await sql`DELETE FROM customers WHERE id = ${req.params.id} RETURNING id`;
+    if (!rows[0]) return res.status(404).json({ error: 'Cliente não encontrado.' });
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 // ── Login do cliente ─────────────────────────────────────────
 app.post('/api/login', async (req, res) => {
   try {
