@@ -111,9 +111,14 @@ export default function AdminPanel() {
 
       {/* Mic visual */}
       <div className="mic-area">
-        <div className={`mic-ring ${isListening ? 'active' : ''}`}>
+        <button
+          className={`mic-ring ${isListening ? 'active' : ''} ${step === S.IDLE || step === S.FOUND ? 'clickable' : ''}`}
+          onClick={step === S.IDLE ? startNameStep : step === S.FOUND ? startActionStep : undefined}
+          disabled={step !== S.IDLE && step !== S.FOUND}
+          aria-label="Ativar microfone"
+        >
           <span className="mic-emoji">{isListening ? '🔴' : '🎙️'}</span>
-        </div>
+        </button>
         {isListening && (
           <div className="wave-bars">
             {[...Array(7)].map((_, i) => (

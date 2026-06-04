@@ -160,7 +160,23 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 0 0 0 var(--purple-glow);
-  transition: box-shadow .3s;
+  transition: box-shadow .3s, transform .15s, opacity .2s;
+  border: none;
+  padding: 0;
+  cursor: default;
+}
+.mic-ring.clickable {
+  cursor: pointer;
+}
+.mic-ring.clickable:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 0 8px var(--purple-glow);
+}
+.mic-ring.clickable:active {
+  transform: scale(0.96);
+}
+.mic-ring:disabled {
+  opacity: 0.65;
 }
 .mic-ring.active {
   animation: mic-pulse 1.4s infinite;
