@@ -4,11 +4,21 @@ import { formatCurrency, formatDate, formatCPF } from '../utils/speechParser';
 
 export default function DevPanel({ onLogout }) {
   const [customers, setCustomers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [expanded, setExpanded] = useState(null);
 
   const refresh = useCallback(async () => {
-    const data = await getAllCustomers();
-    setCustomers(data);
+    setLoading(true);
+    setError('');
+    try {
+      const data = await getAllCustomers();
+      setCustomers(data);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -56,9 +66,19 @@ export default function DevPanel({ onLogout }) {
         </div>
 
         <div className="dev-list">
-          {customers.length === 0 && (
+          {loading && (
             <p style={{ padding: '2rem', textAlign: 'center', color: 'var(--muted)' }}>
               Carregando...
+            </p>
+          )}
+          {!loading && error && (
+            <p style={{ padding: '2rem', textAlign: 'center', color: 'var(--red)' }}>
+              ⚠️ {error}
+            </p>
+          )}
+          {!loading && !error && customers.length === 0 && (
+            <p style={{ padding: '2rem', textAlign: 'center', color: 'var(--muted)' }}>
+              Nenhum cliente cadastrado.
             </p>
           )}
           {customers.map((c) => {

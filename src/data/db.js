@@ -36,7 +36,11 @@ export async function getCustomerFresh(customerId) {
 
 export async function getAllCustomers() {
   const r = await fetch(`${API}/customers`);
-  return r.ok ? r.json() : [];
+  if (!r.ok) {
+    const data = await r.json().catch(() => ({}));
+    throw new Error(data.error || `Erro ${r.status}`);
+  }
+  return r.json();
 }
 
 // ── Escritas ─────────────────────────────────────────────────

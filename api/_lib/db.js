@@ -1,16 +1,17 @@
-import { neon, Pool } from '@neondatabase/serverless';
+import { neon } from '@neondatabase/serverless';
 import { hashPassword } from './hash.js';
 
-export const sql = neon(process.env.POSTGRES_URL);
-
-// Pool reutilizado entre invocações warm (necessário para transações)
-export const pool = globalThis.__pgPool
-  ?? (globalThis.__pgPool = new Pool({ connectionString: process.env.POSTGRES_URL }));
+export function getSql() {
+  const url = process.env.POSTGRES_URL_NON_POOLING ?? process.env.POSTGRES_URL;
+  if (!url) throw new Error('POSTGRES_URL não configurado nas variáveis de ambiente.');
+  return globalThis.__neonSql ?? (globalThis.__neonSql = neon(url));
+}
 
 let ready = globalThis.__pgReady ?? false;
 
 export async function ensureSchema() {
   if (ready) return;
+  const sql = getSql();
 
   await sql`
     CREATE TABLE IF NOT EXISTS customers (
@@ -32,12 +33,12 @@ export async function ensureSchema() {
   `;
 
   const [row] = await sql`SELECT 1 FROM customers LIMIT 1`;
-  if (!row) await seed();
+  if (!row) await seed(sql);
 
   globalThis.__pgReady = ready = true;
 }
 
-async function seed() {
+async function seed(sql) {
   const data = [
     {
       id: '1', name: 'Maria Silva', cpf: '12345678900', pwd: '123456', bal: 150.00,
