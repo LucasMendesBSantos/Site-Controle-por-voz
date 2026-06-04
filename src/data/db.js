@@ -55,6 +55,18 @@ export async function addTransaction(customerId, type, value) {
   return r.ok;
 }
 
+export async function updateNicknames(id, nicknames) {
+  const r = await fetch(`${API}/customers/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ nicknames }),
+  });
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) return { error: data.error || 'Erro ao atualizar apelidos.' };
+  dispatch();
+  return { ok: true };
+}
+
 export async function updateCustomerName(id, name) {
   const r = await fetch(`${API}/customers/${id}`, {
     method: 'PATCH',

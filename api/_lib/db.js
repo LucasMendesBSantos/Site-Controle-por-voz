@@ -32,6 +32,8 @@ export async function ensureSchema() {
     )
   `;
 
+  await sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS nicknames JSONB DEFAULT '[]'`;
+
   const [row] = await sql`SELECT 1 FROM customers LIMIT 1`;
   if (!row) await seed(sql);
 

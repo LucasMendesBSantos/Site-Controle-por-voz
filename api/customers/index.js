@@ -7,7 +7,7 @@ export default async function handler(req, res) {
     const sql = getSql();
 
     if (req.method === 'GET') {
-      const customers = await sql`SELECT id, name, cpf, balance::float FROM customers ORDER BY name`;
+      const customers = await sql`SELECT id, name, cpf, balance::float, nicknames FROM customers ORDER BY name`;
       const allTxs = await sql`SELECT id, customer_id, date, type, value::float FROM transactions ORDER BY date DESC`;
 
       const txMap = {};
@@ -35,7 +35,7 @@ export default async function handler(req, res) {
         INSERT INTO customers (id, name, cpf, password_hash, balance)
         VALUES (${id}, ${name.trim()}, ${clean}, ${hashPassword(password)}, 0)
       `;
-      return res.status(201).json({ id, name: name.trim(), cpf: clean, balance: 0, transactions: [] });
+      return res.status(201).json({ id, name: name.trim(), cpf: clean, balance: 0, nicknames: [], transactions: [] });
     }
 
     res.status(405).end();

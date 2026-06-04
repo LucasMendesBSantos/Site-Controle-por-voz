@@ -9,11 +9,13 @@ export default async function handler(req, res) {
     const q = (req.query.name || '').toLowerCase().trim();
     if (!q) return res.json(null);
 
-    const customers = await sql`SELECT id, name, cpf, balance::float FROM customers`;
+    const customers = await sql`SELECT id, name, cpf, balance::float, nicknames FROM customers`;
     const found = customers.find((c) => {
       const full = c.name.toLowerCase();
       const first = full.split(' ')[0];
-      return full.includes(q) || q.includes(first) || first.startsWith(q);
+      const nicks = Array.isArray(c.nicknames) ? c.nicknames.map(n => n.toLowerCase()) : [];
+      return full.includes(q) || q.includes(first) || first.startsWith(q)
+        || nicks.some(n => n === q || n.includes(q) || q.includes(n));
     });
 
     if (!found) return res.json(null);
