@@ -6,12 +6,23 @@ const PORT = 3001;
 const app = express();
 app.use(express.json());
 
+// ── Admin login ──────────────────────────────────────────────
+app.post('/api/admin-login', (req, res) => {
+  const { username, password } = req.body ?? {};
+  const validUser = process.env.ADMIN_USERNAME || 'Elza';
+  const validPass = process.env.ADMIN_PASSWORD || '021129';
+  if (username === validUser && password === validPass) return res.json({ ok: true });
+  res.status(401).json({ error: 'Usuário ou senha incorretos.' });
+});
+
 // ── Dev login ────────────────────────────────────────────────
 app.post('/api/dev-login', (req, res) => {
   const { username, password } = req.body ?? {};
-  const validUser = process.env.DEV_USERNAME || 'Lucas';
-  const validPass = process.env.DEV_PASSWORD || 'Hellen';
-  if (username === validUser && password === validPass) return res.json({ ok: true });
+  const users = [
+    { user: process.env.DEV_USERNAME  || 'Lucas',  pass: process.env.DEV_PASSWORD  || 'Hellen' },
+    { user: process.env.DEV_USERNAME2 || 'Hellen', pass: process.env.DEV_PASSWORD2 || 'Lucas'  },
+  ];
+  if (users.some((u) => u.user === username && u.pass === password)) return res.json({ ok: true });
   res.status(401).json({ error: 'Usuário ou senha incorretos.' });
 });
 

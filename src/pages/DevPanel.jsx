@@ -5,6 +5,7 @@ import {
   getClothingTypes, addClothingType, removeClothingType,
 } from '../data/db';
 import { formatCurrency, formatDate, formatCPF } from '../utils/speechParser';
+import DevDashboard from './DevDashboard';
 
 export default function DevPanel({ onLogout }) {
   // ── Clientes ─────────────────────────────────────────────────
@@ -21,6 +22,8 @@ export default function DevPanel({ onLogout }) {
 
   // Apelidos
   const [nickInputs, setNickInputs] = useState({});
+
+  const [activeTab, setActiveTab] = useState('dados');
 
   // ── Peças de roupa ───────────────────────────────────────────
   const [clothingTypes, setClothingTypes] = useState([]);
@@ -127,7 +130,19 @@ export default function DevPanel({ onLogout }) {
 
   // ── Stats ────────────────────────────────────────────────────
   const totalDebt = customers.reduce((sum, c) => sum + Math.max(c.balance, 0), 0);
-  const totalTx   = customers.reduce((sum, c) => sum + c.transactions.length, 0);
+
+  const startOfWeek = (() => {
+    const d = new Date();
+    const day = d.getDay();
+    d.setDate(d.getDate() - (day === 0 ? 6 : day - 1)); // volta para segunda-feira
+    d.setHours(0, 0, 0, 0);
+    return d;
+  })();
+
+  const weeklyTx = customers.reduce(
+    (sum, c) => sum + c.transactions.filter((tx) => new Date(tx.date) >= startOfWeek).length,
+    0
+  );
 
   return (
     <div className="dev-panel">
@@ -137,6 +152,20 @@ export default function DevPanel({ onLogout }) {
         <p>Gerenciamento do banco de dados (Neon Postgres)</p>
       </div>
 
+      {/* Tabs */}
+      <div className="dev-tab-bar">
+        <button className={`dev-tab-btn ${activeTab === 'dados' ? 'active' : ''}`} onClick={() => setActiveTab('dados')}>
+          📋 Dados
+        </button>
+        <button className={`dev-tab-btn ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => setActiveTab('dashboard')}>
+          📊 Dashboard
+        </button>
+      </div>
+
+      {activeTab === 'dashboard' && <DevDashboard customers={customers} />}
+
+      {activeTab === 'dados' && <>
+
       {/* Stats */}
       <div className="dev-stats">
         <div className="dev-stat">
@@ -144,8 +173,9 @@ export default function DevPanel({ onLogout }) {
           <span className="dev-stat-label">Clientes</span>
         </div>
         <div className="dev-stat">
-          <span className="dev-stat-value">{totalTx}</span>
+          <span className="dev-stat-value">{weeklyTx}</span>
           <span className="dev-stat-label">Transações</span>
+          <span className="dev-stat-sublabel">esta semana</span>
         </div>
         <div className="dev-stat">
           <span className="dev-stat-value">{formatCurrency(totalDebt)}</span>
@@ -334,6 +364,8 @@ export default function DevPanel({ onLogout }) {
           })}
         </div>
       </div>
+
+      </> /* fim activeTab === 'dados' */}
     </div>
   );
 }

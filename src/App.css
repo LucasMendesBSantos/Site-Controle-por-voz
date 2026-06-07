@@ -142,6 +142,18 @@
 .admin-hero-icon { font-size: 3rem; margin-bottom: .5rem; }
 .admin-hero h2 { font-size: 1.5rem; font-weight: 700; margin: 0 0 .25rem; }
 .admin-hero p  { font-size: .875rem; opacity: .85; margin: 0; }
+.admin-logout-btn {
+  margin-top: .75rem;
+  padding: .35rem .9rem;
+  border: 1px solid rgba(255,255,255,.4);
+  border-radius: var(--r-pill);
+  background: rgba(255,255,255,.15);
+  color: #fff;
+  font-size: .8rem;
+  cursor: pointer;
+  transition: background .15s;
+}
+.admin-logout-btn:hover { background: rgba(255,255,255,.25); }
 
 /* Mic area */
 .mic-area {
@@ -657,6 +669,95 @@
 .dev-hero h2 { font-size: 1.4rem; font-weight: 700; margin: 0 0 .25rem; }
 .dev-hero p  { font-size: .875rem; opacity: .8; margin: 0; }
 
+/* ── Abas do DevPanel ───────────────────────────────────────── */
+.dev-tab-bar {
+  display: flex;
+  gap: .375rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: .35rem;
+  box-shadow: var(--shadow);
+}
+.dev-tab-btn {
+  flex: 1;
+  padding: .5rem 1rem;
+  border: none;
+  border-radius: calc(var(--r) - 2px);
+  background: transparent;
+  color: var(--muted);
+  font-size: .875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.dev-tab-btn:hover { background: var(--bg); color: var(--text); }
+.dev-tab-btn.active { background: var(--purple); color: #fff; box-shadow: 0 2px 8px var(--purple-glow); }
+
+/* ── Dashboard de gráficos ──────────────────────────────────── */
+.dev-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+.dash-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: .75rem;
+}
+.dash-kpi {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: .2rem;
+  box-shadow: var(--shadow);
+}
+.dash-kpi.highlight { border-color: var(--purple); background: rgba(124,58,237,.04); }
+.dash-kpi-value { font-size: 1.25rem; font-weight: 700; color: var(--purple); }
+.dash-kpi-label { font-size: .72rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.dash-chart-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 1.25rem 1.5rem;
+  box-shadow: var(--shadow);
+}
+.dash-chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.dash-chart-title { font-size: 1rem; font-weight: 700; color: var(--text); margin: 0 0 1rem; }
+.dash-chart-header .dash-chart-title { margin: 0; }
+.dash-month-select {
+  font-size: .8rem;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: .3rem .6rem;
+  color: var(--text);
+  background: var(--surface);
+  cursor: pointer;
+  outline: none;
+}
+.dash-month-select:focus { border-color: var(--purple); }
+.dash-empty { text-align: center; color: var(--muted); font-size: .875rem; padding: 2rem 0; }
+.chart-tooltip {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: .5rem .75rem;
+  box-shadow: var(--shadow);
+  font-size: .8rem;
+}
+.chart-tooltip-label { font-weight: 700; color: var(--text); margin: 0 0 .2rem; }
+.chart-tooltip-val   { color: var(--purple); font-weight: 700; margin: 0 0 .1rem; }
+.chart-tooltip-count { color: var(--muted); margin: 0; }
+
 /* Stats */
 .dev-stats {
   display: grid;
@@ -686,6 +787,11 @@
   text-transform: uppercase;
   letter-spacing: .06em;
   color: var(--muted);
+}
+.dev-stat-sublabel {
+  font-size: .65rem;
+  color: var(--border);
+  margin-top: -.15rem;
 }
 
 /* Section */

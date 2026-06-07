@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import AdminLogin from './pages/AdminLogin';
 import AdminPanel from './pages/AdminPanel';
 import ClientLogin from './pages/ClientLogin';
 import ClientRegister from './pages/ClientRegister';
@@ -14,6 +15,7 @@ export default function App() {
   const [view, setView] = useState(VIEW.ADMIN);
   const [clientView, setClientView] = useState(CVIEW.LOGIN);
   const [customer, setCustomer] = useState(null);
+  const [adminAuth, setAdminAuth] = useState(false);
   const [devAuth, setDevAuth] = useState(false);
 
   const switchToClient = () => {
@@ -61,7 +63,11 @@ export default function App() {
       </header>
 
       <main className="app-main">
-        {view === VIEW.ADMIN && <AdminPanel />}
+        {view === VIEW.ADMIN && (
+          adminAuth
+            ? <AdminPanel onLogout={() => setAdminAuth(false)} />
+            : <AdminLogin onLogin={() => setAdminAuth(true)} />
+        )}
 
         {view === VIEW.CLIENT && (
           customer ? (

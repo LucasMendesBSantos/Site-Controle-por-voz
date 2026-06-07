@@ -12,7 +12,7 @@ const S = {
   ERROR: 'error',
 };
 
-export default function AdminPanel() {
+export default function AdminPanel({ onLogout }) {
   const [step, setStep] = useState(S.IDLE);
   const [pending, setPending] = useState(null); // { customer, type, value, item }
   const [heard, setHeard] = useState('');
@@ -110,6 +110,9 @@ export default function AdminPanel() {
         <div className="admin-hero-icon">🎤</div>
         <h2>Painel do Administrador</h2>
         <p>Registre transações com uma única fala</p>
+        {onLogout && (
+          <button className="admin-logout-btn" onClick={onLogout}>🚪 Sair</button>
+        )}
       </div>
 
       {/* Mic visual */}
