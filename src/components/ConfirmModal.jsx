@@ -1,7 +1,8 @@
 import { formatCurrency } from '../utils/speechParser';
 
 export default function ConfirmModal({ customer, pending, onConfirm, onCancel }) {
-  const isCompra = pending.type === 'compra';
+  const isCompra  = pending.type === 'compra';
+  const isQuitou  = pending.type === 'quitou';
   const newBalance = parseFloat(
     (isCompra ? customer.balance + pending.value : customer.balance - pending.value).toFixed(2)
   );
@@ -11,9 +12,9 @@ export default function ConfirmModal({ customer, pending, onConfirm, onCancel })
       <h3>Confirmar Transação</h3>
 
       <div className={`tx-summary ${isCompra ? 'compra' : 'pagamento'}`}>
-        <span className="tx-icon">{isCompra ? '🛒' : '💰'}</span>
+        <span className="tx-icon">{isCompra ? '🛒' : isQuitou ? '✅' : '💰'}</span>
         <div className="tx-details">
-          <span className="tx-label">{isCompra ? 'Compra' : 'Pagamento'}</span>
+          <span className="tx-label">{isCompra ? 'Compra' : isQuitou ? 'Quitação Total' : 'Pagamento'}</span>
           {pending.item && (
             <span className="tx-item">📦 {pending.item}</span>
           )}

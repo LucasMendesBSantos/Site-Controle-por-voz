@@ -55,6 +55,18 @@ export default function AdminPanel({ onLogout }) {
         setStep(S.ERROR);
         return;
       }
+
+      if (parsed.type === 'quitou') {
+        if (customer.balance <= 0) {
+          setErrorMsg(`${customer.name} não possui débitos em aberto.`);
+          setStep(S.ERROR);
+          return;
+        }
+        setPending({ customer, type: 'quitou', value: customer.balance, item: null });
+        setStep(S.CONFIRMING);
+        return;
+      }
+
       setPending({ customer, type: parsed.type, value: parsed.value, item: parsed.item });
       setStep(S.CONFIRMING);
     } catch {
@@ -73,9 +85,10 @@ export default function AdminPanel({ onLogout }) {
 
   const handleConfirm = async () => {
     try {
+      const txType = pending.type === 'quitou' ? 'pagamento' : pending.type;
       const ok = await addTransaction(
         pending.customer.id,
-        pending.type,
+        txType,
         pending.value,
         pending.item
       );

@@ -114,6 +114,12 @@ function extractItem(afterVerb, clothingTypes) {
 export function parseFullCommand(text, clothingTypes = []) {
   const s = text.toLowerCase().trim().replace(/\s+/g, ' ');
 
+  // ── Quitação total: "[nome] quitou" ou "[nome] pagou tudo" ──
+  const quitouM = s.match(/^(.+?)\s+(?:quitou|pagou\s+tudo)\.?$/);
+  if (quitouM) {
+    return { name: quitouM[1].trim(), type: 'quitou', value: null, item: null };
+  }
+
   // Detecta verbo e divide a frase
   const comprouM = s.match(/^(.+?)\s+comprou\s+(.+)$/);
   const pagouM   = s.match(/^(.+?)\s+pagou\s+(.+)$/);
