@@ -36,7 +36,7 @@ export default function AdminPanel() {
 
     if (!parsed) {
       setErrorMsg(
-        'Não entendi o comando. Tente: "Maria comprou uma blusa de 25 reais" ou "Maria pagou 50 reais".'
+        `Não entendi: "${text}". Tente: "Maria comprou uma blusa de 25 reais" ou "Maria pagou 50 reais".`
       );
       setStep(S.ERROR);
       return;
