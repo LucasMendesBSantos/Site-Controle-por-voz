@@ -11,7 +11,7 @@ export default async function handler(req, res) {
         SELECT c.id, c.name, c.cpf, c.balance::float, c.nicknames,
           COALESCE(
             json_agg(
-              json_build_object('id', t.id, 'date', t.date, 'type', t.type, 'value', t.value::float)
+              json_build_object('id', t.id, 'date', t.date, 'type', t.type, 'value', t.value::float, 'item', t.item)
               ORDER BY t.date DESC
             ) FILTER (WHERE t.id IS NOT NULL),
             '[]'::json

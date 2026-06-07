@@ -57,6 +57,7 @@ export default function ClientDashboard({ customerId, onLogout }) {
                 <tr>
                   <th>Data / Hora</th>
                   <th>Tipo</th>
+                  <th>Item</th>
                   <th>Valor</th>
                 </tr>
               </thead>
@@ -69,6 +70,7 @@ export default function ClientDashboard({ customerId, onLogout }) {
                         {tx.type === 'compra' ? '🛒 Compra' : '💰 Pagamento'}
                       </span>
                     </td>
+                    <td className="td-item">{tx.item || '—'}</td>
                     <td className={`td-val ${tx.type}`}>
                       {tx.type === 'compra' ? '+' : '−'}{formatCurrency(tx.value)}
                     </td>

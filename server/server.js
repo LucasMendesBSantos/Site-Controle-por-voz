@@ -31,7 +31,7 @@ app.get('/api/customers/search', async (req, res) => {
     if (!found) return res.json(null);
 
     const txs = await sql`
-      SELECT id, date, type, value::float FROM transactions
+      SELECT id, date, type, value::float, item FROM transactions
       WHERE customer_id = ${found.id} ORDER BY date DESC
     `;
     res.json({ ...found, transactions: txs });
@@ -43,12 +43,12 @@ app.get('/api/customers', async (_req, res) => {
   try {
     const sql = getSql();
     const customers = await sql`SELECT id, name, cpf, balance::float FROM customers ORDER BY name`;
-    const allTxs = await sql`SELECT id, customer_id, date, type, value::float FROM transactions ORDER BY date DESC`;
+    const allTxs = await sql`SELECT id, customer_id, date, type, value::float, item FROM transactions ORDER BY date DESC`;
 
     const txMap = {};
     for (const tx of allTxs) {
       if (!txMap[tx.customer_id]) txMap[tx.customer_id] = [];
-      txMap[tx.customer_id].push({ id: tx.id, date: tx.date, type: tx.type, value: tx.value });
+      txMap[tx.customer_id].push({ id: tx.id, date: tx.date, type: tx.type, value: tx.value, item: tx.item });
     }
     res.json(customers.map((c) => ({ ...c, transactions: txMap[c.id] ?? [] })));
   } catch (e) { res.status(500).json({ error: e.message }); }
@@ -115,7 +115,7 @@ app.post('/api/login', async (req, res) => {
     }
 
     const txs = await sql`
-      SELECT id, date, type, value::float FROM transactions
+      SELECT id, date, type, value::float, item FROM transactions
       WHERE customer_id = ${customer.id} ORDER BY date DESC
     `;
     const { password_hash, ...safe } = customer;

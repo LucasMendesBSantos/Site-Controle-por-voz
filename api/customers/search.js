@@ -21,7 +21,7 @@ export default async function handler(req, res) {
     if (!found) return res.json(null);
 
     const txs = await sql`
-      SELECT id, date, type, value::float FROM transactions
+      SELECT id, date, type, value::float, item FROM transactions
       WHERE customer_id = ${found.id} ORDER BY date DESC
     `;
     res.json({ ...found, transactions: txs });

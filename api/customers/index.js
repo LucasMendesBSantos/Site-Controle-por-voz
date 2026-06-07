@@ -8,12 +8,12 @@ export default async function handler(req, res) {
 
     if (req.method === 'GET') {
       const customers = await sql`SELECT id, name, cpf, balance::float, nicknames FROM customers ORDER BY name`;
-      const allTxs = await sql`SELECT id, customer_id, date, type, value::float FROM transactions ORDER BY date DESC`;
+      const allTxs = await sql`SELECT id, customer_id, date, type, value::float, item FROM transactions ORDER BY date DESC`;
 
       const txMap = {};
       for (const tx of allTxs) {
         if (!txMap[tx.customer_id]) txMap[tx.customer_id] = [];
-        txMap[tx.customer_id].push({ id: tx.id, date: tx.date, type: tx.type, value: tx.value });
+        txMap[tx.customer_id].push({ id: tx.id, date: tx.date, type: tx.type, value: tx.value, item: tx.item });
       }
 
       return res.json(customers.map((c) => ({ ...c, transactions: txMap[c.id] ?? [] })));
