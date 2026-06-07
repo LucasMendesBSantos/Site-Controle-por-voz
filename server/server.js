@@ -150,7 +150,7 @@ app.post('/api/customers', async (req, res) => {
 app.post('/api/transactions', async (req, res) => {
   try {
     const sql = getSql();
-    const { customerId, type, value } = req.body ?? {};
+    const { customerId, type, value, item } = req.body ?? {};
     if (!customerId || !type || value == null) return res.status(400).json({ error: 'Dados incompletos.' });
 
     const [customer] = await sql`SELECT id, balance::float FROM customers WHERE id = ${customerId}`;
@@ -165,14 +165,43 @@ app.post('/api/transactions', async (req, res) => {
     );
     const txId = `t${Date.now()}`;
     const date = new Date().toISOString();
+    const itemValue = item?.trim() || null;
 
     await sql`
-      INSERT INTO transactions (id, customer_id, date, type, value)
-      VALUES (${txId}, ${customerId}, ${date}, ${type}, ${txValue})
+      INSERT INTO transactions (id, customer_id, date, type, value, item)
+      VALUES (${txId}, ${customerId}, ${date}, ${type}, ${txValue}, ${itemValue})
     `;
     await sql`UPDATE customers SET balance = ${newBalance} WHERE id = ${customerId}`;
 
-    res.status(201).json({ id: txId, date, type, value: txValue });
+    res.status(201).json({ id: txId, date, type, value: txValue, item: itemValue });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// ── Peças de roupa ───────────────────────────────────────────
+app.get('/api/clothing-types', async (_req, res) => {
+  try {
+    const sql = getSql();
+    const rows = await sql`SELECT name FROM clothing_types ORDER BY name`;
+    res.json(rows.map((r) => r.name));
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/clothing-types', async (req, res) => {
+  try {
+    const sql = getSql();
+    const { name } = req.body ?? {};
+    if (!name?.trim()) return res.status(400).json({ error: 'Nome é obrigatório.' });
+    const clean = name.trim().toLowerCase();
+    await sql`INSERT INTO clothing_types (name) VALUES (${clean}) ON CONFLICT DO NOTHING`;
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.delete('/api/clothing-types/:name', async (req, res) => {
+  try {
+    const sql = getSql();
+    await sql`DELETE FROM clothing_types WHERE name = ${req.params.name}`;
+    res.json({ ok: true });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 

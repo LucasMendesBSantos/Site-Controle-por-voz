@@ -14,6 +14,9 @@ export default function ConfirmModal({ customer, pending, onConfirm, onCancel })
         <span className="tx-icon">{isCompra ? '🛒' : '💰'}</span>
         <div className="tx-details">
           <span className="tx-label">{isCompra ? 'Compra' : 'Pagamento'}</span>
+          {pending.item && (
+            <span className="tx-item">📦 {pending.item}</span>
+          )}
           <span className="tx-val">{formatCurrency(pending.value)}</span>
           <span className="tx-who">
             para <strong>{customer.name}</strong>

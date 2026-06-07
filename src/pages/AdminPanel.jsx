@@ -1,14 +1,12 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useSpeech } from '../hooks/useSpeech';
-import { findCustomerByName, addTransaction } from '../data/db';
-import { parseVoiceCommand, formatCurrency } from '../utils/speechParser';
+import { findCustomerByName, addTransaction, getClothingTypes } from '../data/db';
+import { parseFullCommand, formatCurrency } from '../utils/speechParser';
 import ConfirmModal from '../components/ConfirmModal';
 
 const S = {
   IDLE: 'idle',
-  LISTEN_NAME: 'listen_name',
-  FOUND: 'found',
-  LISTEN_ACTION: 'listen_action',
+  LISTENING: 'listening',
   CONFIRMING: 'confirming',
   SUCCESS: 'success',
   ERROR: 'error',
@@ -16,65 +14,65 @@ const S = {
 
 export default function AdminPanel() {
   const [step, setStep] = useState(S.IDLE);
-  const [customer, setCustomer] = useState(null);
-  const [pending, setPending] = useState(null);
+  const [pending, setPending] = useState(null); // { customer, type, value, item }
   const [heard, setHeard] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+  const [clothingTypes, setClothingTypes] = useState([]);
 
   const { isListening, startListening } = useSpeech();
+
+  useEffect(() => {
+    getClothingTypes().then(setClothingTypes);
+  }, []);
 
   const onError = useCallback((msg) => {
     setErrorMsg(msg);
     setStep(S.ERROR);
   }, []);
 
-  const onNameResult = useCallback(async (text) => {
+  const onResult = useCallback(async (text) => {
     setHeard(`"${text}"`);
+    const parsed = parseFullCommand(text, clothingTypes);
+
+    if (!parsed) {
+      setErrorMsg(
+        'Não entendi o comando. Tente: "Maria comprou uma blusa de 25 reais" ou "Maria pagou 50 reais".'
+      );
+      setStep(S.ERROR);
+      return;
+    }
+
     try {
-      const found = await findCustomerByName(text);
-      if (found) {
-        setCustomer(found);
-        setStep(S.FOUND);
-      } else {
-        setErrorMsg(`Cliente "${text}" não encontrado. Tente novamente.`);
+      const customer = await findCustomerByName(parsed.name);
+      if (!customer) {
+        setErrorMsg(`Cliente "${parsed.name}" não encontrado. Verifique o nome e tente novamente.`);
         setStep(S.ERROR);
+        return;
       }
-    } catch {
-      setErrorMsg('Erro de conexão com o servidor. Verifique se ele está rodando.');
-      setStep(S.ERROR);
-    }
-  }, []);
-
-  const onActionResult = useCallback((text) => {
-    setHeard(`"${text}"`);
-    const parsed = parseVoiceCommand(text);
-    if (parsed) {
-      setPending(parsed);
+      setPending({ customer, type: parsed.type, value: parsed.value, item: parsed.item });
       setStep(S.CONFIRMING);
-    } else {
-      setErrorMsg('Não entendi o comando. Diga "Comprou X reais" ou "Pagou X reais".');
+    } catch {
+      setErrorMsg('Erro de conexão com o servidor.');
       setStep(S.ERROR);
     }
-  }, []);
+  }, [clothingTypes]);
 
-  const startNameStep = () => {
-    setStep(S.LISTEN_NAME);
+  const activate = () => {
+    setStep(S.LISTENING);
     setHeard('');
     setErrorMsg('');
-    setCustomer(null);
     setPending(null);
-    startListening(onNameResult, onError);
-  };
-
-  const startActionStep = () => {
-    setStep(S.LISTEN_ACTION);
-    setHeard('');
-    startListening(onActionResult, onError);
+    startListening(onResult, onError);
   };
 
   const handleConfirm = async () => {
     try {
-      const ok = await addTransaction(customer.id, pending.type, pending.value);
+      const ok = await addTransaction(
+        pending.customer.id,
+        pending.type,
+        pending.value,
+        pending.item
+      );
       if (ok) {
         setStep(S.SUCCESS);
       } else {
@@ -82,13 +80,13 @@ export default function AdminPanel() {
         setStep(S.ERROR);
       }
     } catch {
-      setErrorMsg('Erro de conexão ao salvar. Verifique o servidor.');
+      setErrorMsg('Erro de conexão ao salvar.');
       setStep(S.ERROR);
     }
   };
 
   const handleCancel = () => {
-    setStep(S.FOUND);
+    setStep(S.IDLE);
     setPending(null);
     setHeard('');
   };
@@ -97,7 +95,6 @@ export default function AdminPanel() {
     setStep(S.IDLE);
     setHeard('');
     setErrorMsg('');
-    setCustomer(null);
     setPending(null);
   };
 
@@ -106,15 +103,15 @@ export default function AdminPanel() {
       <div className="admin-hero">
         <div className="admin-hero-icon">🎤</div>
         <h2>Painel do Administrador</h2>
-        <p>Registre transações por comando de voz</p>
+        <p>Registre transações com uma única fala</p>
       </div>
 
       {/* Mic visual */}
       <div className="mic-area">
         <button
-          className={`mic-ring ${isListening ? 'active' : ''} ${step === S.IDLE || step === S.FOUND ? 'clickable' : ''}`}
-          onClick={step === S.IDLE ? startNameStep : step === S.FOUND ? startActionStep : undefined}
-          disabled={step !== S.IDLE && step !== S.FOUND}
+          className={`mic-ring ${isListening ? 'active' : ''} ${step === S.IDLE ? 'clickable' : ''}`}
+          onClick={step === S.IDLE ? activate : undefined}
+          disabled={step !== S.IDLE}
           aria-label="Ativar microfone"
         >
           <span className="mic-emoji">{isListening ? '🔴' : '🎙️'}</span>
@@ -136,50 +133,31 @@ export default function AdminPanel() {
         {step === S.IDLE && (
           <div className="step-body center">
             <p className="step-desc">
-              Clique no botão abaixo, diga o nome do cliente e depois informe a transação.
+              Clique no microfone e diga o nome do cliente, o que comprou e o valor — tudo de uma vez.
             </p>
-            <button className="btn-mic" onClick={startNameStep}>
+            <p className="step-hint">
+              Ex: <em>"Maria comprou uma blusa de 25 reais"</em><br />
+              Ex: <em>"João pagou 50 reais"</em>
+            </p>
+            <button className="btn-mic" onClick={activate}>
               🎤 Ativar Microfone
             </button>
           </div>
         )}
 
-        {step === S.LISTEN_NAME && (
+        {step === S.LISTENING && (
           <div className="step-body center">
-            <span className="step-badge">Passo 1 / 2</span>
-            <p className="step-desc">Diga o <strong>nome do cliente</strong></p>
-            <p className="step-hint">Ex: "Maria" ou "João Santos"</p>
+            <p className="step-desc">Ouvindo… diga o nome, o item e o valor</p>
+            <p className="step-hint">
+              <em>"[nome] comprou um[a] [peça] de [valor] reais"</em><br />
+              <em>"[nome] pagou [valor] reais"</em>
+            </p>
           </div>
         )}
 
-        {step === S.FOUND && customer && (
-          <div className="step-body center">
-            <div className="found-chip">
-              ✅ <strong>{customer.name}</strong>
-            </div>
-            <div className="balance-chip">
-              Saldo atual: <strong>{formatCurrency(customer.balance)}</strong>
-            </div>
-            <span className="step-badge">Passo 2 / 2</span>
-            <p className="step-desc">O que ele fez?</p>
-            <button className="btn-mic" onClick={startActionStep}>
-              🎤 Dizer ação
-            </button>
-          </div>
-        )}
-
-        {step === S.LISTEN_ACTION && (
-          <div className="step-body center">
-            <div className="found-chip">✅ <strong>{customer?.name}</strong></div>
-            <span className="step-badge">Passo 2 / 2</span>
-            <p className="step-desc">Diga a <strong>ação e o valor</strong></p>
-            <p className="step-hint">"Comprou 50 reais" · "Pagou cinquenta reais"</p>
-          </div>
-        )}
-
-        {step === S.CONFIRMING && pending && customer && (
+        {step === S.CONFIRMING && pending && (
           <ConfirmModal
-            customer={customer}
+            customer={pending.customer}
             pending={pending}
             onConfirm={handleConfirm}
             onCancel={handleCancel}
@@ -192,8 +170,9 @@ export default function AdminPanel() {
             <h3 className="success-title">Transação Registrada!</h3>
             <p className="step-desc">
               {pending?.type === 'compra' ? 'Compra' : 'Pagamento'} de{' '}
-              <strong>{formatCurrency(pending?.value)}</strong> para{' '}
-              <strong>{customer?.name}</strong> salvo com sucesso.
+              <strong>{formatCurrency(pending?.value)}</strong>
+              {pending?.item ? <> — <strong>{pending.item}</strong></> : null}
+              {' '}para <strong>{pending?.customer?.name}</strong> salvo com sucesso.
             </p>
             <button className="btn-secondary" onClick={reset}>
               + Nova Transação

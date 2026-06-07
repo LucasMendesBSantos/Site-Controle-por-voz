@@ -32,10 +32,22 @@ export async function ensureSchema() {
     )
   `;
 
-  await sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS nicknames JSONB DEFAULT '[]'`;
+  await sql`
+    CREATE TABLE IF NOT EXISTS clothing_types (
+      name TEXT PRIMARY KEY
+    )
+  `;
+
+  await sql`ALTER TABLE customers    ADD COLUMN IF NOT EXISTS nicknames JSONB DEFAULT '[]'`;
+  await sql`ALTER TABLE transactions ADD COLUMN IF NOT EXISTS item TEXT`;
 
   const [row] = await sql`SELECT 1 FROM customers LIMIT 1`;
   if (!row) await seed(sql);
+
+  const [clothingRow] = await sql`SELECT 1 FROM clothing_types LIMIT 1`;
+  if (!clothingRow) {
+    await sql`INSERT INTO clothing_types (name) VALUES ('blusa'), ('calça'), ('vestido')`;
+  }
 
   globalThis.__pgReady = ready = true;
 }

@@ -798,6 +798,101 @@
   white-space: nowrap;
 }
 
+/* ── Apelidos & Peças de Roupa ──────────────────────────────── */
+.dev-nick-section {
+  border-bottom: 1px dashed var(--amber-border);
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: .6rem;
+}
+.dev-nick-title {
+  font-size: .8rem;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  margin: 0;
+}
+.nick-chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+}
+.nick-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+  background: var(--purple-glow);
+  border: 1px solid var(--purple);
+  border-radius: var(--r-pill);
+  padding: .2rem .6rem;
+  font-size: .8rem;
+  color: var(--purple-dk);
+  font-weight: 600;
+}
+.clothing-chip {
+  background: rgba(217,119,6,.12);
+  border-color: var(--amber-border);
+  color: var(--amber);
+}
+.nick-chip-remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: .65rem;
+  color: inherit;
+  padding: 0;
+  line-height: 1;
+  opacity: .7;
+}
+.nick-chip-remove:hover { opacity: 1; }
+
+.dev-nick-add {
+  display: flex;
+  gap: .4rem;
+}
+.dev-nick-input {
+  flex: 1;
+  font-size: .85rem;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: .3rem .6rem;
+  outline: none;
+  color: var(--text);
+  min-width: 0;
+}
+.dev-nick-input:focus { border-color: var(--purple); }
+.btn-nick-add {
+  padding: .3rem .75rem;
+  border: none;
+  border-radius: var(--r-sm);
+  background: var(--purple);
+  color: #fff;
+  font-size: .8rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.btn-nick-add:hover { opacity: .9; }
+
+/* Coluna item na tabela de transações */
+.td-item {
+  font-size: .8rem;
+  color: var(--muted);
+  font-style: italic;
+  white-space: nowrap;
+}
+
+/* Item no ConfirmModal */
+.tx-item {
+  font-size: .8rem;
+  color: var(--muted);
+  font-style: italic;
+}
+
 .dev-row-left {
   display: flex;
   flex-direction: column;

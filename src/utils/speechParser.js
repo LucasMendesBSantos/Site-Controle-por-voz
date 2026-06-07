@@ -69,23 +69,90 @@ function wordsToNumber(text) {
   return total + current;
 }
 
+function extractValue(text) {
+  const t = text.trim();
+  const numMatch = t.match(/^(\d+(?:[.,]\d{1,2})?)$/);
+  if (numMatch) {
+    const v = parseFloat(numMatch[1].replace(',', '.'));
+    return v > 0 ? v : null;
+  }
+  const v = wordsToNumber(t);
+  return v > 0 ? v : null;
+}
+
+function matchClothingType(text, clothingTypes) {
+  if (!text || !clothingTypes.length) return text || null;
+  const lower = text.toLowerCase();
+  const exact = clothingTypes.find((t) => t.toLowerCase() === lower);
+  if (exact) return exact;
+  const partial = clothingTypes.find(
+    (t) => lower.includes(t.toLowerCase()) || t.toLowerCase().includes(lower)
+  );
+  return partial || text;
+}
+
+/**
+ * Parseia um comando de voz completo numa única fala.
+ *
+ * Compra:   "[nome] comprou [artigo?] [item] de [valor] reais"
+ * Pagamento: "[nome] pagou [valor] reais"
+ *
+ * Retorna { name, type, value, item } ou null se não entendeu.
+ */
+export function parseFullCommand(text, clothingTypes = []) {
+  const s = text.toLowerCase().trim().replace(/\s+/g, ' ');
+
+  // ── Compra ───────────────────────────────────────────────────
+  const comprouMatch = s.match(/^(.+?)\s+comprou\s+(.*?)\s+reais?\.?$/);
+  if (comprouMatch) {
+    const [, namePart, rest] = comprouMatch;
+
+    // Tenta separar item e valor em "[item] de [valor]"
+    const deMatch = rest.match(/^(.*)\s+de\s+(.+)$/); // greedy: último "de"
+    if (deMatch) {
+      const value = extractValue(deMatch[2]);
+      if (value !== null) {
+        const rawItem = deMatch[1].trim().replace(/^um[a]?\s+/, '');
+        return {
+          name: namePart.trim(),
+          type: 'compra',
+          value,
+          item: matchClothingType(rawItem, clothingTypes),
+        };
+      }
+    }
+
+    // Sem item: "comprou 25 reais"
+    const value = extractValue(rest);
+    if (value !== null) {
+      return { name: namePart.trim(), type: 'compra', value, item: null };
+    }
+  }
+
+  // ── Pagamento ────────────────────────────────────────────────
+  const pagouMatch = s.match(/^(.+?)\s+pagou\s+(.+?)\s+reais?\.?$/);
+  if (pagouMatch) {
+    const value = extractValue(pagouMatch[2]);
+    if (value !== null) {
+      return { name: pagouMatch[1].trim(), type: 'pagamento', value, item: null };
+    }
+  }
+
+  return null;
+}
+
+// Mantido para compatibilidade com outros usos pontuais
 export function parseVoiceCommand(text) {
   const t = text.toLowerCase().trim();
-
   let type = null;
   if (/\b(comprou|comprar|compra)\b/.test(t)) type = 'compra';
   else if (/\b(pagou|pagar|pagamento|recebeu|receber)\b/.test(t)) type = 'pagamento';
-
   if (!type) return null;
-
-  // Try numeric first: "50", "50,00", "50.00"
   const numMatch = t.match(/(\d+(?:[.,]\d{1,2})?)/);
   let value = numMatch
     ? parseFloat(numMatch[1].replace(',', '.'))
     : wordsToNumber(t.replace(/comprou|comprar|compra|pagou|pagar|pagamento|recebeu|receber/, ''));
-
   if (!value || value <= 0 || isNaN(value)) return null;
-
   return { type, value };
 }
 
@@ -95,11 +162,8 @@ export function formatCurrency(value) {
 
 export function formatDate(isoString) {
   return new Intl.DateTimeFormat('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
+    day: '2-digit', month: '2-digit', year: 'numeric',
+    hour: '2-digit', minute: '2-digit',
   }).format(new Date(isoString));
 }
 

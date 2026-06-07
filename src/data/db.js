@@ -1,7 +1,6 @@
 const API = '/api';
 const DB_EVENT = 'elza-db-updated';
 
-// Notifica componentes que escutam atualizações (mesmo navegador)
 function dispatch() {
   window.dispatchEvent(new CustomEvent(DB_EVENT));
 }
@@ -43,28 +42,33 @@ export async function getAllCustomers() {
   return r.json();
 }
 
+export async function getClothingTypes() {
+  const r = await fetch(`${API}/clothing-types`);
+  return r.ok ? r.json() : [];
+}
+
 // ── Escritas ─────────────────────────────────────────────────
 
-export async function addTransaction(customerId, type, value) {
+export async function addTransaction(customerId, type, value, item = null) {
   const r = await fetch(`${API}/transactions`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ customerId, type, value }),
+    body: JSON.stringify({ customerId, type, value, item }),
   });
   if (r.ok) dispatch();
   return r.ok;
 }
 
-export async function updateNicknames(id, nicknames) {
-  const r = await fetch(`${API}/customers/${id}`, {
-    method: 'PATCH',
+export async function registerCustomer(name, cpf, password) {
+  const r = await fetch(`${API}/customers`, {
+    method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ nicknames }),
+    body: JSON.stringify({ name, cpf, password }),
   });
-  const data = await r.json().catch(() => ({}));
-  if (!r.ok) return { error: data.error || 'Erro ao atualizar apelidos.' };
+  const data = await r.json();
+  if (!r.ok) return { error: data.error || 'Erro ao cadastrar.' };
   dispatch();
-  return { ok: true };
+  return { customer: data };
 }
 
 export async function updateCustomerName(id, name) {
@@ -79,6 +83,18 @@ export async function updateCustomerName(id, name) {
   return { ok: true };
 }
 
+export async function updateNicknames(id, nicknames) {
+  const r = await fetch(`${API}/customers/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ nicknames }),
+  });
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) return { error: data.error || 'Erro ao atualizar apelidos.' };
+  dispatch();
+  return { ok: true };
+}
+
 export async function deleteCustomer(id) {
   const r = await fetch(`${API}/customers/${id}`, { method: 'DELETE' });
   const data = await r.json().catch(() => ({}));
@@ -87,14 +103,22 @@ export async function deleteCustomer(id) {
   return { ok: true };
 }
 
-export async function registerCustomer(name, cpf, password) {
-  const r = await fetch(`${API}/customers`, {
+export async function addClothingType(name) {
+  const r = await fetch(`${API}/clothing-types`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name, cpf, password }),
+    body: JSON.stringify({ name }),
   });
-  const data = await r.json();
-  if (!r.ok) return { error: data.error || 'Erro ao cadastrar.' };
-  dispatch();
-  return { customer: data };
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) return { error: data.error || 'Erro ao adicionar.' };
+  return { ok: true };
+}
+
+export async function removeClothingType(name) {
+  const r = await fetch(`${API}/clothing-types/${encodeURIComponent(name)}`, {
+    method: 'DELETE',
+  });
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) return { error: data.error || 'Erro ao remover.' };
+  return { ok: true };
 }

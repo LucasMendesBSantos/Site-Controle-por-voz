@@ -5,7 +5,7 @@ export default async function handler(req, res) {
   try {
     await ensureSchema();
 
-    const { customerId, type, value } = req.body ?? {};
+    const { customerId, type, value, item } = req.body ?? {};
     if (!customerId || !type || value == null) return res.status(400).json({ error: 'Dados incompletos.' });
 
     const sql = getSql();
@@ -21,14 +21,15 @@ export default async function handler(req, res) {
     );
     const txId = `t${Date.now()}`;
     const date = new Date().toISOString();
+    const itemValue = item?.trim() || null;
 
     await sql`
-      INSERT INTO transactions (id, customer_id, date, type, value)
-      VALUES (${txId}, ${customerId}, ${date}, ${type}, ${txValue})
+      INSERT INTO transactions (id, customer_id, date, type, value, item)
+      VALUES (${txId}, ${customerId}, ${date}, ${type}, ${txValue}, ${itemValue})
     `;
     await sql`UPDATE customers SET balance = ${newBalance} WHERE id = ${customerId}`;
 
-    res.status(201).json({ id: txId, date, type, value: txValue });
+    res.status(201).json({ id: txId, date, type, value: txValue, item: itemValue });
   } catch (e) {
     console.error('[/api/transactions]', e);
     res.status(500).json({ error: e.message });
