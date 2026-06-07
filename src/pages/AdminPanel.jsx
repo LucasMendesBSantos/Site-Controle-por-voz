@@ -25,6 +25,12 @@ export default function AdminPanel() {
     getClothingTypes().then(setClothingTypes);
   }, []);
 
+  useEffect(() => {
+    if (step !== S.SUCCESS) return;
+    const t = setTimeout(reset, 2000);
+    return () => clearTimeout(t);
+  }, [step]);
+
   const onError = useCallback((msg) => {
     setErrorMsg(msg);
     setStep(S.ERROR);
@@ -174,9 +180,7 @@ export default function AdminPanel() {
               {pending?.item ? <> — <strong>{pending.item}</strong></> : null}
               {' '}para <strong>{pending?.customer?.name}</strong> salvo com sucesso.
             </p>
-            <button className="btn-secondary" onClick={reset}>
-              + Nova Transação
-            </button>
+            <p className="step-hint">Voltando em instantes…</p>
           </div>
         )}
 
