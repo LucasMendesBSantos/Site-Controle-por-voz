@@ -3,13 +3,14 @@ import AdminLogin from './pages/AdminLogin';
 import AdminPanel from './pages/AdminPanel';
 import ClientLogin from './pages/ClientLogin';
 import ClientRegister from './pages/ClientRegister';
+import ClientResetPassword from './pages/ClientResetPassword';
 import ClientDashboard from './pages/ClientDashboard';
 import DevLogin from './pages/DevLogin';
 import DevPanel from './pages/DevPanel';
 import './App.css';
 
 const VIEW = { ADMIN: 'admin', CLIENT: 'client', DEV: 'dev' };
-const CVIEW = { LOGIN: 'login', REGISTER: 'register' };
+const CVIEW = { LOGIN: 'login', REGISTER: 'register', RESET: 'reset' };
 
 export default function App() {
   const [view, setView] = useState(VIEW.ADMIN);
@@ -76,12 +77,15 @@ export default function App() {
             <ClientLogin
               onLogin={setCustomer}
               onGoToRegister={() => setClientView(CVIEW.REGISTER)}
+              onGoToReset={() => setClientView(CVIEW.RESET)}
             />
-          ) : (
+          ) : clientView === CVIEW.REGISTER ? (
             <ClientRegister
               onRegistered={setCustomer}
               onGoToLogin={() => setClientView(CVIEW.LOGIN)}
             />
+          ) : (
+            <ClientResetPassword onGoToLogin={() => setClientView(CVIEW.LOGIN)} />
           )
         )}
 

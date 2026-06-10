@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { loginCustomer } from '../data/db';
 import { formatCPF } from '../utils/speechParser';
 
-export default function ClientLogin({ onLogin, onGoToRegister }) {
+export default function ClientLogin({ onLogin, onGoToRegister, onGoToReset }) {
   const [cpf, setCPF] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -77,6 +77,11 @@ export default function ClientLogin({ onLogin, onGoToRegister }) {
           Não tem conta?{' '}
           <button type="button" className="link-btn" onClick={onGoToRegister}>
             Cadastrar-se
+          </button>
+        </div>
+        <div className="auth-switch">
+          <button type="button" className="link-btn" onClick={onGoToReset}>
+            Esqueceu a senha?
           </button>
         </div>
 
